@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>AI Competency Assessment Agent</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#1e3c72,#2a5298);min-height:100vh;color:#333;padding:16px}
+.wrap{max-width:640px;margin:0 auto}
+.card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 8px 24px rgba(0,0,0,.2);margin-bottom:16px}
+h1{font-size:20px;margin:0 0 8px}
+h2{font-size:17px;margin:0 0 12px}
+p{line-height:1.5;font-size:14px;color:#555}
+button{width:100%;padding:14px;border:none;border-radius:10px;background:#2a5298;color:#fff;font-size:15px;font-weight:600;margin-top:10px;cursor:pointer}
+button:active{transform:scale(.98)}
+button.alt{background:#e8eef8;color:#2a5298}
+.opt{display:block;width:100%;text-align:left;padding:14px;margin:8px 0;border:2px solid #e0e6f0;border-radius:10px;background:#fff;color:#333;font-size:14px;cursor:pointer}
+.opt.sel{border-color:#2a5298;background:#e8eef8}
+.progress{height:6px;background:#e0e6f0;border-radius:3px;overflow:hidden;margin:12px 0}
+.progress>div{height:100%;background:#2a5298;width:0;transition:width .3s}
+.tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:20px;background:#e8eef8;color:#2a5298;margin-bottom:8px}
+.dim{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;font-size:14px}
+.dim:last-child{border:none}
+.bar{display:inline-block;height:8px;background:#e0e6f0;border-radius:4px;width:80px;overflow:hidden;vertical-align:middle;margin-left:8px}
+.bar>span{display:block;height:100%;background:linear-gradient(90deg,#2a5298,#4a7bd8);border-radius:4px}
+canvas{display:block;margin:0 auto}
+.big{font-size:44px;font-weight:700;color:#2a5298;text-align:center;line-height:1}
+.center{text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const DIMS=[
+ {name:"Basic AI Cognition",short:"Basic AI"},
+ {name:"Prompt Engineering",short:"Prompt"},
+ {name:"AI Tool Utilization",short:"Tools"},
+ {name:"AI Result Evaluation",short:"Evaluation"},
+ {name:"Human-AI Collaboration",short:"Collaboration"},
+ {name:"AI Ethics & Compliance",short:"Ethics"}
+];
+const QUESTIONS={
+0:{1:{q:"What does 'LLM' stand for?",o:["Large Language Model","Linear Learning Machine","Logical Layer Model","Long-term Memory"],a:0},
+   2:{q:"Which is a typical 'AI hallucination'?",o:["A correct but slow answer","A plausible-sounding but factually wrong answer","An image with low resolution","A hardware failure"],a:1},
+   3:{q:"In an LLM, what does 'temperature' mainly control?",o:["Randomness/creativity of output","Model memory size","Training speed","GPU temperature"],a:0}},
+1:{1:{q:"Which prompt is the clearest?",o:["Tell me about AI","Explain AI to a 10-year-old in 3 sentences","AI???","Write something"],a:1},
+   2:{q:"What is 'few-shot prompting'?",o:["Asking the model very few questions","Giving the model a few examples of the desired output","Running the model on few GPUs","Using a short prompt"],a:1},
+   3:{q:"You need a structured JSON output. Best approach?",o:["Ask politely once","Give a schema/example and explicit format constraints","Use shorter words","Ask the model to guess"],a:1}},
+2:{1:{q:"Which is an AI tool for code generation?",o:["GitHub Copilot","Excel","Notepad","Photoshop"],a:0},
+   2:{q:"You must analyze a 500-row CSV. Best AI workflow?",o:["Paste everything and hope","Use a data-analysis AI tool and ask for a specific metric","Ask the model to memorize it","Skip analysis"],a:1},
+   3:{q:"To generate images from text, you would use:",o:["A code editor","A text-to-image model","A spreadsheet","A database"],a:1}},
+3:{1:{q:"AI gives a confident but wrong fact. You should:",o:["Trust it","Verify with a reliable source","Ignore AI forever","Copy it directly"],a:1},
+   2:{q:"What is a good way to reduce hallucinations?",o:["Ask the model to cite sources and verify them","Increase temperature","Ask more vaguely","Use shorter prompts"],a:0},
+   3:{q:"You notice biased output from an AI model. Best action?",o:["Publish it","Flag it and ask for balanced alternatives","Ignore it","Increase the speed"],a:1}},
+4:{1:{q:"Human-AI collaboration means:",o:["AI does everything","Human and AI split tasks by strength","Human does nothing","AI replaces the human"],a:1},
+   2:{q:"Best way to complete a complex task with AI?",o:["One huge prompt and accept the result","Decompose into steps, review each AI output","Ask AI to do it all at once","Skip planning"],a:1},
+   3:{q:"When AI output is partially wrong, the best step is:",o:["Restart everything","Give corrective feedback and iterate","Submit as is","Delete the project"],a:1}},
+5:{1:{q:"Before pasting personal data into an AI chat, you should:",o:["Paste it anyway","Remove/anonymize sensitive data first","Share your password","Ignore privacy"],a:1},
+   2:{q:"AI-generated content used commercially must consider:",o:["Only speed","Copyright and license terms","Only length","Only language"],a:1},
+   3:{q:"Responsible AI usage includes:",o:["Hiding AI involvement","Transparency about AI use and human review","Removing all citations","Using AI for everything"],a:1}}
+};
+const TIPS=[
+"Review fundamental AI concepts: model types, how LLMs work, limitations and safety basics.",
+"Practice clear prompts: define role, task, format, constraints, and give few-shot examples.",
+"Explore more AI tools: text, image, code generation and data-analysis assistants.",
+"Practice verifying AI outputs: check facts, spot hallucinations and bias, write improved prompts.",
+"Practice decomposing complex tasks and iterating with AI step by step.",
+"Strengthen AI ethics: privacy protection, copyright, transparency and responsible use."
+];
+const app=document.getElementById('app');
+let S={dim:0,level:2,asked:[],points:[0,0,0,0,0,0],curLevel:2};
+
+function renderIntro(){
+ app.innerHTML=`<div class="card">
+  <div class="tag">DEMO · AI COMPETENCY ASSESSMENT AGENT</div>
+  <h1>AI Competency Assessment</h1>
+  <p>This demo assesses <b>6 AI competency dimensions</b> using an <b>adaptive question engine</b>. Maximum 18 questions, about 3 minutes.</p>
+  <p><b>Adaptive logic:</b> correct answer → harder question; wrong answer → easier question.</p>
+  <button onclick="begin()">Start Assessment</button></div>`;
+}
+function begin(){S={dim:0,level:2,asked:[],points:[0,0,0,0,0,0],curLevel:2};renderQuestion();}
+function renderQuestion(){
+ if(S.dim>=6){renderReport();return;}
+ let level=S.level;
+ if(S.asked.includes(level)){
+  const rem=[1,2,3].filter(l=>!S.asked.includes(l));
+  if(rem.length===0){S.dim++;S.asked=[];S.level=2;renderQuestion();return;}
+  level=rem[0];
+ }
+ const q=QUESTIONS[S.dim][level];S.asked.push(level);S.curLevel=level;
+ const totalQ=S.dim*3+S.asked.length;const pct=(totalQ/18)*100;
+ ap
