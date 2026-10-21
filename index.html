@@ -32,7 +32,7 @@ canvas{display:block;margin:0 auto}
 <body>
 <div class="wrap" id="app"></div>
 <script>
-const DIMS=[
+ const DIMS=[
  {name:"Basic AI Cognition",short:"Basic AI"},
  {name:"Prompt Engineering",short:"Prompt"},
  {name:"AI Tool Utilization",short:"Tools"},
@@ -70,7 +70,6 @@ const TIPS=[
 ];
 const app=document.getElementById('app');
 let S={dim:0,level:2,asked:[],points:[0,0,0,0,0,0],curLevel:2};
-
 function renderIntro(){
  app.innerHTML=`<div class="card">
   <div class="tag">DEMO · AI COMPETENCY ASSESSMENT AGENT</div>
@@ -90,4 +89,70 @@ function renderQuestion(){
  }
  const q=QUESTIONS[S.dim][level];S.asked.push(level);S.curLevel=level;
  const totalQ=S.dim*3+S.asked.length;const pct=(totalQ/18)*100;
- ap
+ app.innerHTML=`<div class="card">
+  <div class="tag">Dimension ${S.dim+1}/6 · ${DIMS[S.dim].name}</div>
+  <div class="progress"><div style="width:${pct}%"></div></div>
+  <h2>${q.q}</h2><div id="opts"></div></div>`;
+ const opts=document.getElementById('opts');
+ q.o.forEach((t,i)=>{
+  const b=document.createElement('button');b.className='opt';
+  b.textContent=String.fromCharCode(65+i)+'. '+t;
+  b.onclick=()=>{if(opts.dataset.lock)return;opts.dataset.lock=1;b.classList.add('sel');
+   setTimeout(()=>answer(i===q.a,level),200);};
+  opts.appendChild(b);
+ });
+}
+function answer(correct,level){
+ if(correct)S.points[S.dim]+=level;
+ let next=correct?level+1:level-1;
+ if(next<1)next=1;if(next>3)next=3;S.level=next;
+ if(S.asked.length>=3){S.dim++;S.asked=[];S.level=2;}
+ renderQuestion();
+}
+function renderReport(){
+ const scores=S.points.map(p=>Math.round(p/6*100));
+ const overall=Math.round(scores.reduce((a,b)=>a+b,0)/6);
+ let html=`<div class="card center">
+  <div class="tag">ASSESSMENT REPORT</div><h1>Your AI Competency Profile</h1>
+  <div class="big">${overall}</div><p>Overall Score / 100</p>
+  <canvas id="radar" width="300" height="300"></canvas></div>
+  <div class="card"><h2>Dimension Breakdown</h2>`;
+ DIMS.forEach((d,i)=>{
+  html+=`<div class="dim"><span>${d.short}</span>
+   <span><b>${scores[i]}</b><span class="bar"><span style="width:${scores[i]}%"></span></span></span></div>`;
+ });
+ html+=`</div><div class="card"><h2>Personalized Suggestions</h2>`;
+ const sorted=scores.map((s,i)=>({s,i})).sort((a,b)=>a.s-b.s).slice(0,2);
+ sorted.forEach(w=>{html+=`<p><b>${DIMS[w.i].name}:</b> ${TIPS[w.i]}</p>`;});
+ html+=`<button class="alt" onclick="begin()">Retake Assessment</button></div>`;
+ app.innerHTML=html;drawRadar(scores);
+}
+function drawRadar(scores){
+ const c=document.getElementById('radar'),ctx=c.getContext('2d');
+ const W=c.width,H=c.height,cx=W/2,cy=H/2,R=Math.min(W,H)/2-40,n=6;
+ ctx.clearRect(0,0,W,H);
+ for(let ring=1;ring<=4;ring++){
+  ctx.beginPath();
+  for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n,r=R*ring/4;
+   const x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+  ctx.closePath();ctx.strokeStyle='#dbe3f0';ctx.stroke();
+ }
+ for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R);
+  ctx.strokeStyle='#dbe3f0';ctx.stroke();}
+ ctx.beginPath();
+ for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n,r=R*(scores[i]||0)/100;
+  const x=cx+Math.cos(a)*r,y=cy+Math.sin(a)*r;i?ctx.lineTo(x,y):ctx.moveTo(x,y);}
+ ctx.closePath();ctx.fillStyle='rgba(42,82,152,.25)';ctx.fill();
+ ctx.strokeStyle='#2a5298';ctx.lineWidth=2;ctx.stroke();
+ for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n,r=R*(scores[i]||0)/100;
+  ctx.beginPath();ctx.arc(cx+Math.cos(a)*r,cy+Math.sin(a)*r,3.5,0,7);
+  ctx.fillStyle='#2a5298';ctx.fill();}
+ ctx.fillStyle='#333';ctx.font='11px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+ for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;
+  ctx.fillText(DIMS[i].short,cx+Math.cos(a)*(R+22),cy+Math.sin(a)*(R+22));}
+}
+renderIntro();
+</script>
+</body>
+</html>
