@@ -5,105 +5,37 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
 <title>AI Competency Assessment Agent</title>
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
-body{
-  font-family: 'Inter', -apple-system, sans-serif;
-  background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a2980);
-  background-size: 300% 300%;
-  animation: gradientBG 12s ease infinite;
-  color: #c9d1d9;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-@keyframes gradientBG {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-.header{
-  background-color: rgba(22, 27, 34, 0.8);
-  border-bottom: 1px solid #30363d;
-  padding: 12px 16px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.header h1{font-size: 15px; font-weight: 600; color: #e6edf3; display: flex; align-items: center; gap: 8px;}
-.dot{width: 8px; height: 8px; background: #238636; border-radius: 50%; box-shadow: 0 0 8px #238636;}
-.badge{font-size: 10px; background: #1f6feb33; color: #58a6ff; padding: 3px 8px; border-radius: 12px; border: 1px solid #1f6feb;}
-
-.chat-container{
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  scroll-behavior: smooth;
-}
-.msg{
-  max-width: 85%;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  line-height: 1.5;
-  animation: fadeIn 0.3s ease;
-}
-@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-
-.msg.bot{
-  align-self: flex-start;
-  background-color: #21262d;
-  border: 1px solid #30363d;
-  border-bottom-left-radius: 0;
-  color: #e6edf3;
-}
-.msg.user{
-  align-self: flex-end;
-  background-color: #1f6feb;
-  color: #ffffff;
-  border-bottom-right-radius: 0;
-}
-
-.options-container{
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  align-self: flex-start;
-  width: 100%;
-  max-width: 90%;
-  margin-top: 4px;
-}
-.opt-btn{
-  background-color: transparent;
-  color: #58a6ff;
-  border: 1px solid #30363d;
-  padding: 12px;
-  border-radius: 8px;
-  text-align: left;
-  font-size: 13px;
-  font-family: 'Inter', sans-serif;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.opt-btn:hover, .opt-btn:active{background-color: #1f6feb22; border-color: #1f6feb;}
-.opt-btn .icon{color: #8b949e; font-family: 'Fira Code', monospace;}
-
-.report-card{
-  background: #161b22;
-  border: 1px solid #30363d;
-  border-radius: 12px;
-  padding: 16px;
-  margin-top: 10px;
-  text-align: center;
-}
-.report-card h2{color:#e6edf3; font-size: 16px; margin-bottom: 10px;}
-.score-big{font-size: 42px; font-weight: 700; color: #3fb950; line-height: 1;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#1e3c72,#2a5298);min-height:100vh;color:#333;padding:16px}
+.wrap{max-width:640px;margin:0 auto}
+.card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 8px 24px rgba(0,0,0,.2);margin-bottom:16px}
+h1{font-size:20px;margin:0 0 8px}
+h2{font-size:17px;margin:0 0 12px}
+p{line-height:1.5;font-size:14px;color:#555}
+button{width:100%;padding:14px;border:none;border-radius:10px;background:#2a5298;color:#fff;font-size:15px;font-weight:600;margin-top:10px;cursor:pointer}
+button:active{transform:scale(.98)}
+button.alt{background:#e8eef8;color:#2a5298}
+.opt{display:block;width:100%;text-align:left;padding:14px;margin:8px 0;border:2px solid #e0e6f0;border-radius:10px;background:#fff;color:#333;font-size:14px;cursor:pointer}
+.opt.sel{border-color:#2a5298;background:#e8eef8}
+.progress{height:6px;background:#e0e6f0;border-radius:3px;overflow:hidden;margin:12px 0}
+.progress>div{height:100%;background:#2a5298;width:0;transition:width .3s}
+.tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:20px;background:#e8eef8;color:#2a5298;margin-bottom:8px}
+.dim{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;font-size:14px}
+.dim:last-child{border:none}
+.bar{display:inline-block;height:8px;background:#e0e6f0;border-radius:4px;width:80px;overflow:hidden;vertical-align:middle;margin-left:8px}
+.bar>span{display:block;height:100%;background:linear-gradient(90deg,#2a5298,#4a7bd8);border-radius:4px}
+canvas{display:block;margin:0 auto}
+.big{font-size:44px;font-weight:700;color:#2a5298;text-align:center;line-height:1}
+.center{text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const DIMS=[
+ {name:"Basic AI Cognition",short:"Basic AI"},
+ {name:"Prompt Engineering",short:"Prompt"},
+ {name:"AI Tool Utilization",short:"Tools"},
  {name:"AI Result Evaluation",short:"Evaluation"},
  {name:"Human-AI Collaboration",short:"Collaboration"},
  {name:"AI Ethics & Compliance",short:"Ethics"}
@@ -138,6 +70,172 @@ const TIPS=[
 ];
 const app=document.getElementById('app');
 let S={dim:0,level:2,asked:[],points:[0,0,0,0,0,0],curLevel:2};
+
+function renderIntro(){
+ app.innerHTML=`<div class="card">
+  <div class="tag">DEMO · AI COMPETENCY ASSESSMENT AGENT</div>
+  <h1>AI Competency Assessment</h1>
+  <p>This demo assesses <b>6 AI competency dimensions</b> using an <b>adaptive question engine</b>. Maximum 18 questions, about 3 minutes.</p>
+  <p><b>Adaptive logic:</b> correct answer → harder question; wrong answer → easier question.</p>
+  <button onclick="begin()">Start Assessment</button></div>`;
+}
+function begin(){S={dim:0,level:2,asked:[],points:[0,0,0,0,0,0],curLevel:2};renderQuestion();}
+function renderQuestion(){
+ if(S.dim>=6){renderReport();return;}
+ let level=S.level;
+ if(S.asked.includes(level)){
+  const rem=[1,2,3].filter(l=>!S.asked.includes(l));
+  if(rem.length===0){S.dim++;S.asked=[];S.level=2;renderQuestion();return;}
+  level=rem[0];
+ }
+ const q=QUESTIONS[S.dim][level];S.asked.push(level);S.curLevel=level;
+ const totalQ=S.dim*3+S.asked.length;const pct=(totalQ/18)*100;
+ Takım projesi yardımı
+Analyze the User's Image and Problem:
+
+The user's screenshot shows the GitHub code editor.
+
+Crucially, the line count is now 158 lines (previously it was stuck at 93). This means the code was fully pasted this time.
+
+Major Problem: Look at the code itself. The tags are in Turkish (<KAFA>, vücut, sabit DIMS, sabit SORULAR). The variables are translated (isim, kısa). The question content is in Turkish.
+
+Cause: The browser's Google Translate is actively translating the code editor itself as the user types/pastes. HTML tags like <head> are being translated to <KAFA>, and JavaScript keywords like const to sabit. This completely breaks the code.
+
+Formulate the Solution:
+
+Immediate Action: The user must disable Google Translate on this page. The code is corrupted beyond repair in its current state on the screen. They need to revert or paste clean English code while translation is off.
+
+Step-by-step instructions:
+
+Explain why it's broken (Google Translate translated the code).
+Tell them how to turn off translation (click the Google Translate icon in the address bar and select "Show original" / "Orijinali göster").
+Re-paste the code. Since it's a mobile browser, copying large chunks sometimes fails, so provide the code again in one block, but emphasize checking the beginning and end.
+Tell them exactly what to look for (<head> not <KAFA>, const not sabit).
+Drafting the Response (in Turkish, matching user's language and tone):
+
+Acknowledge success: Line count is 158, meaning the whole code got pasted! Great!
+
+Identify the new issue: Look at lines 3, 32, 35, 43. It says <KAFA>, vücut, sabit, isim. Google Translate messed up the code.
+
+Actionable steps:
+
+Turn off translate (Tap the translate icon in the URL bar -> Show Original).
+
+Delete all current code.
+
+Paste the English code back.
+
+Provide the clean code again to make it easy for them.
+
+Refining the Code Block:
+
+Keep it clean. The code itself is fine, it's just the user's environment translating it.
+
+Self-Correction/Edge Case Check:
+
+Is there a way to make the code immune to Google Translate? Adding translate="no" to the HTML tag helps rendered pages, but here the user is in GitHub's raw editor. The editor translates the text area.
+
+The only fix is turning off translate on the browser tab.
+
+Also, confirm the user saves the file after translation is off.
+
+Kral mükemmel bir gelişme var: Bu sefer kodun tamamı yapışmış! Sol üstte "158 lines" (158 satır) yazıyor. Artık kod kesilmiyor.
+
+AMA ÇOK BÜYÜK BİR SORUN VAR: Ekran görüntüsüne dikkatli bak. Google Çeviri (Translate) senin yazdığın kodu bile Türkçeye çevirmiş!
+
+<head> yerine <KAFA> olmuş.
+
+<body> yerine <vücut> olmuş.
+
+const yerine sabit olmuş.
+
+name yerine isim olmuş.
+
+Kodlama dillerinde bu kelimeler değişirse sistem çalışmaz, o yüzden mavi ekranda kalıyor.
+
+Hemen düzeltiyoruz:
+
+1. ADIM: Çeviriyi Kapat
+Tarayıcının en üstündeki adres çubuğunda (github.com yazan yerde) sağ tarafta küçük bir Google Çeviri (G) simgesi vardır. Ona dokun ve "Orijinali göster" (Show original) seçeneğine bas. Kodların tekrar İngilizce olduğundan emin ol.
+
+2. ADIM: Kodu Temizle ve Yapıştır
+Şu anki düzenleme ekranındaki tüm kodları sil (hepsini seç ve sil).
+Çeviri kapalıyken, aşağıdaki tertemiz kodu tek seferde kopyalayıp yapıştır.
+
+html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>AI Competency Assessment Agent</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#1e3c72,#2a5298);min-height:100vh;color:#333;padding:16px}
+.wrap{max-width:640px;margin:0 auto}
+.card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 8px 24px rgba(0,0,0,.2);margin-bottom:16px}
+h1{font-size:20px;margin:0 0 8px}
+h2{font-size:17px;margin:0 0 12px}
+p{line-height:1.5;font-size:14px;color:#555}
+button{width:100%;padding:14px;border:none;border-radius:10px;background:#2a5298;color:#fff;font-size:15px;font-weight:600;margin-top:10px;cursor:pointer}
+button:active{transform:scale(.98)}
+button.alt{background:#e8eef8;color:#2a5298}
+.opt{display:block;width:100%;text-align:left;padding:14px;margin:8px 0;border:2px solid #e0e6f0;border-radius:10px;background:#fff;color:#333;font-size:14px;cursor:pointer}
+.opt.sel{border-color:#2a5298;background:#e8eef8}
+.progress{height:6px;background:#e0e6f0;border-radius:3px;overflow:hidden;margin:12px 0}
+.progress>div{height:100%;background:#2a5298;width:0;transition:width .3s}
+.tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:20px;background:#e8eef8;color:#2a5298;margin-bottom:8px}
+.dim{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;font-size:14px}
+.dim:last-child{border:none}
+.bar{display:inline-block;height:8px;background:#e0e6f0;border-radius:4px;width:80px;overflow:hidden;vertical-align:middle;margin-left:8px}
+.bar>span{display:block;height:100%;background:linear-gradient(90deg,#2a5298,#4a7bd8);border-radius:4px}
+canvas{display:block;margin:0 auto}
+.big{font-size:44px;font-weight:700;color:#2a5298;text-align:center;line-height:1}
+.center{text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+<script>
+const DIMS=[
+ {name:"Basic AI Cognition",short:"Basic AI"},
+ {name:"Prompt Engineering",short:"Prompt"},
+ {name:"AI Tool Utilization",short:"Tools"},
+ {name:"AI Result Evaluation",short:"Evaluation"},
+ {name:"Human-AI Collaboration",short:"Collaboration"},
+ {name:"AI Ethics & Compliance",short:"Ethics"}
+];
+const QUESTIONS={
+0:{1:{q:"What does 'LLM' stand for?",o:["Large Language Model","Linear Learning Machine","Logical Layer Model","Long-term Memory"],a:0},
+   2:{q:"Which is a typical 'AI hallucination'?",o:["A correct but slow answer","A plausible-sounding but factually wrong answer","An image with low resolution","A hardware failure"],a:1},
+   3:{q:"In an LLM, what does 'temperature' mainly control?",o:["Randomness/creativity of output","Model memory size","Training speed","GPU temperature"],a:0}},
+1:{1:{q:"Which prompt is the clearest?",o:["Tell me about AI","Explain AI to a 10-year-old in 3 sentences","AI???","Write something"],a:1},
+   2:{q:"What is 'few-shot prompting'?",o:["Asking the model very few questions","Giving the model a few examples of the desired output","Running the model on few GPUs","Using a short prompt"],a:1},
+   3:{q:"You need a structured JSON output. Best approach?",o:["Ask politely once","Give a schema/example and explicit format constraints","Use shorter words","Ask the model to guess"],a:1}},
+2:{1:{q:"Which is an AI tool for code generation?",o:["GitHub Copilot","Excel","Notepad","Photoshop"],a:0},
+   2:{q:"You must analyze a 500-row CSV. Best AI workflow?",o:["Paste everything and hope","Use a data-analysis AI tool and ask for a specific metric","Ask the model to memorize it","Skip analysis"],a:1},
+   3:{q:"To generate images from text, you would use:",o:["A code editor","A text-to-image model","A spreadsheet","A database"],a:1}},
+3:{1:{q:"AI gives a confident but wrong fact. You should:",o:["Trust it","Verify with a reliable source","Ignore AI forever","Copy it directly"],a:1},
+   2:{q:"What is a good way to reduce hallucinations?",o:["Ask the model to cite sources and verify them","Increase temperature","Ask more vaguely","Use shorter prompts"],a:0},
+   3:{q:"You notice biased output from an AI model. Best action?",o:["Publish it","Flag it and ask for balanced alternatives","Ignore it","Increase the speed"],a:1}},
+4:{1:{q:"Human-AI collaboration means:",o:["AI does everything","Human and AI split tasks by strength","Human does nothing","AI replaces the human"],a:1},
+   2:{q:"Best way to complete a complex task with AI?",o:["One huge prompt and accept the result","Decompose into steps, review each AI output","Ask AI to do it all at once","Skip planning"],a:1},
+   3:{q:"When AI output is partially wrong, the best step is:",o:["Restart everything","Give corrective feedback and iterate","Submit as is","Delete the project"],a:1}},
+5:{1:{q:"Before pasting personal data into an AI chat, you should:",o:["Paste it anyway","Remove/anonymize sensitive data first","Share your password","Ignore privacy"],a:1},
+   2:{q:"AI-generated content used commercially must consider:",o:["Only speed","Copyright and license terms","Only length","Only language"],a:1},
+   3:{q:"Responsible AI usage includes:",o:["Hiding AI involvement","Transparency about AI use and human review","Removing all citations","Using AI for everything"],a:1}}
+};
+const TIPS=[
+"Review fundamental AI concepts: model types, how LLMs work, limitations and safety basics.",
+"Practice clear prompts: define role, task, format, constraints, and give few-shot examples.",
+"Explore more AI tools: text, image, code generation and data-analysis assistants.",
+"Practice verifying AI outputs: check facts, spot hallucinations and bias, write improved prompts.",
+"Practice decomposing complex tasks and iterating with AI step by step.",
+"Strengthen AI ethics: privacy protection, copyright, transparency and responsible use."
+];
+const app=document.getElementById('app');
+let S={dim:0,level:2,asked:[],points:[0,0,0,0,0,0],curLevel:2};
+
 function renderIntro(){
  app.innerHTML=`<div class="card">
   <div class="tag">DEMO · AI COMPETENCY ASSESSMENT AGENT</div>
