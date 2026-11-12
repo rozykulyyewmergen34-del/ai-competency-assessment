@@ -347,11 +347,11 @@ function shuffleArray(array) {
 }
 
 function saveInfo(){
-  const n = document.getElementById('uName').value.trim();
-  const id = document.getElementById('uId').value.trim();
+  let n = document.getElementById('uName').value.trim();
+  let id = document.getElementById('uId').value.trim();
   
-  if(n.length < 3) return alert(L === 'en' ? "Invalid Name!" : "姓名无效！");
-  if(!/^[0-9]{5,15}$/.test(id)) return alert(L === 'en' ? "Invalid Student ID!" : "学号无效！");
+  if(!n) n = "Student";
+  if(!id) id = "123456";
   
   U={n,id};
   document.getElementById('login-screen').style.display = 'none';
