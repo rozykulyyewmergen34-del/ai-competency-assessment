@@ -2,131 +2,638 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-<title>AI Competency Assessment Agent</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>NeuroAssess AI - Competency Agent</title>
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
 body{
-  margin:0;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-  background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #1a2980);
-  background-size: 300% 300%;
-  animation: gradientBG 12s ease infinite;
-  min-height:100vh;
-  color:#333;
-  padding:16px;
+  font-family: 'Inter', -apple-system, sans-serif;
+  background-color: #050a10;
+  background-image: radial-gradient(circle at 20% 50%, rgba(0, 240, 255, 0.08), transparent 30%),
+                    radial-gradient(circle at 80% 20%, rgba(0, 240, 255, 0.05), transparent 20%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #c9d1d9;
+  overflow-x: hidden;
 }
-@keyframes gradientBG {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+
+.logo-container { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; justify-content: center; }
+.logo-icon { width: 32px; height: 32px; fill: #00f0ff; filter: drop-shadow(0 0 8px rgba(0,240,255,0.6)); }
+.logo-text { font-size: 22px; font-weight: 800; color: #fff; letter-spacing: -0.5px; }
+.logo-text span { color: #00f0ff; }
+
+#login-screen { display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 1000px; padding: 20px; gap: 40px; }
+.visual-side { display: none; justify-content: center; align-items: center; position: relative; width: 400px; height: 400px; }
+@media (min-width: 850px) { #login-screen { flex-direction: row; justify-content: space-between; } .visual-side { display: flex; } }
+.ai-orb {
+  width: 80px; height: 80px; background: #00f0ff; border-radius: 50%;
+  box-shadow: 0 0 40px 10px rgba(0, 240, 255, 0.6), 0 0 100px 40px rgba(0, 240, 255, 0.2), inset 0 0 20px #fff;
+  position: relative;
 }
-.wrap{max-width:640px;margin:0 auto}
-.card{background:#fff;border-radius:16px;padding:20px;box-shadow:0 8px 24px rgba(0,0,0,.3);margin-bottom:16px}
-h1{font-size:20px;margin:0 0 8px}
-h2{font-size:17px;margin:0 0 12px}
-p{line-height:1.5;font-size:14px;color:#555}
-input[type="text"]{width:100%;padding:14px;border:2px solid #e0e6f0;border-radius:10px;font-size:15px;margin-bottom:12px;font-family:inherit;outline:none;transition:0.2s}
-input[type="text"]:focus{border-color:#2a5298}
-button{width:100%;padding:14px;border:none;border-radius:10px;background:#2a5298;color:#fff;font-size:15px;font-weight:600;margin-top:10px;cursor:pointer;transition:0.2s}
-button:active{transform:scale(.98)}
-button.alt{background:#e8eef8;color:#2a5298}
-.opt{display:block;width:100%;text-align:left;padding:14px;margin:8px 0;border:2px solid #e0e6f0;border-radius:10px;background:#fff;color:#333;font-size:14px;cursor:pointer}
-.opt.sel{border-color:#2a5298;background:#e8eef8}
-.progress{height:6px;background:#e0e6f0;border-radius:3px;overflow:hidden;margin:12px 0}
-.progress>div{height:100%;background:#2a5298;width:0;transition:width .3s}
-.tag{display:inline-block;font-size:11px;padding:3px 8px;border-radius:20px;background:#e8eef8;color:#2a5298;margin-bottom:8px}
-.dim{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #eee;font-size:14px}
+.ai-orb::after {
+  content: ''; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(45deg);
+  width: 300px; height: 300px;
+  background: conic-gradient(from 180deg at 50% 50%, transparent 0deg, rgba(0,240,255,0.1) 90deg, transparent 180deg);
+  border-radius: 50%; z-index: -1; filter: blur(20px);
+}
+.login-card {
+  background: rgba(13, 17, 23, 0.85); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px; padding: 40px;
+  width: 100%; max-width: 440px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+}
+.login-card p { font-size: 14px; color: #8b949e; margin-bottom: 30px; text-align: center;}
+.tabs { display: flex; background: rgba(0,0,0,0.4); border-radius: 12px; padding: 4px; margin-bottom: 24px; }
+.tabs button { flex: 1; padding: 12px; border: none; background: transparent; color: #8b949e; font-size: 14px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.3s; font-family: inherit; }
+.tabs button.active { background: rgba(255,255,255,0.1); color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+.input-label { font-size: 13px; color: #c9d1d9; margin-bottom: 8px; font-weight: 500;}
+.input-group { position: relative; margin-bottom: 20px; }
+.input-group input {
+  width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px; padding: 15px 15px 15px 45px; color: #fff; font-size: 14px;
+  font-family: inherit; outline: none; transition: 0.3s;
+}
+.input-group input:focus { border-color: #00f0ff; box-shadow: 0 0 0 3px rgba(0,240,255,0.1); }
+.input-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); fill: #6e7681; width: 18px; height: 18px; }
+.glow-btn {
+  width: 100%; padding: 16px; border: none; border-radius: 12px;
+  background: #00f0ff; color: #050a10; font-size: 16px; font-weight: 700;
+  font-family: inherit; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  gap: 8px; transition: 0.3s; box-shadow: 0 0 20px rgba(0,240,255,0.4); margin-top: 10px;
+}
+.glow-btn:active { transform: scale(0.98); box-shadow: 0 0 10px rgba(0,240,255,0.4); }
+
+#test-screen { display: none; width: 100%; max-width: 640px; margin: 40px auto; padding: 0 16px; position: relative;}
+.card{
+  background: rgba(13, 17, 23, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 24px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5); margin-bottom: 16px; color: #c9d1d9; position: relative;
+}
+h1 { color: #fff; margin-bottom: 10px;}
+h2 { font-size: 18px; margin: 0 0 16px; color: #e6edf3; line-height: 1.5;}
+p { line-height: 1.6; font-size: 14px; color: #8b949e; }
+
+.nav-buttons { display: flex; justify-content: space-between; margin-top: 20px; gap: 10px; }
+.nav-buttons button { flex: 1; padding: 15px; border: none; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; transition: 0.2s; }
+.btn-prev { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+.btn-next { background: #00f0ff; color: #050a10; box-shadow: 0 0 15px rgba(0,240,255,0.3); }
+.btn-submit { background: #00ff88; color: #050a10; box-shadow: 0 0 15px rgba(0,255,136,0.3); }
+.nav-buttons button:active { transform: scale(.98); }
+
+.opt{
+  display: block; width: 100%; text-align: left; padding: 16px;
+  margin: 10px 0; border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px; background: rgba(0,0,0,0.3); color: #c9d1d9;
+  font-size: 14px; cursor: pointer; transition: 0.3s; line-height: 1.4;
+}
+.opt:hover, .opt:active { border-color: #00f0ff; }
+.opt.sel{
+  border-color: #00f0ff; background: rgba(0, 240, 255, 0.15); color: #fff;
+  box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+}
+
+.textarea-box {
+  width: 100%; height: 120px; padding: 16px; border-radius: 12px;
+  background: rgba(0,0,0,0.3); border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff; font-family: inherit; font-size: 14px; outline: none;
+  resize: none; margin-bottom: 10px; line-height: 1.5;
+}
+.textarea-box:focus { border-color: #00f0ff; box-shadow: 0 0 0 3px rgba(0,240,255,0.1); }
+
+.dots-container { display: flex; justify-content: center; gap: 4px; margin-bottom: 16px; flex-wrap: wrap; }
+.dot { width: 10px; height: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); transition: 0.3s; }
+.dot.active { background: #00f0ff; border-color: #00f0ff; box-shadow: 0 0 10px #00f0ff; transform: scale(1.3); }
+.dot.answered { background: #00ff88; border-color: #00ff88; box-shadow: 0 0 5px rgba(0,255,136,0.5); }
+  .progress{
+  height: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; 
+  margin: 16px 0; border: 1px solid rgba(0, 240, 255, 0.2); position: relative;
+}
+.progress>div{
+  height:100%; background: linear-gradient(90deg, #00f0ff, #0077ff, #00f0ff); background-size: 200% 100%;
+  width:0; transition:width .5s ease; box-shadow: 0 0 12px #00f0ff; animation: waterFlow 1.5s linear infinite;
+}
+@keyframes waterFlow { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+.tag{
+  display:inline-block; font-size:11px; padding:4px 10px; border-radius:20px;
+  background: rgba(0,240,255,0.1); color: #00f0ff; border: 1px solid rgba(0,240,255,0.3);
+  margin-bottom:12px; font-weight: 600; letter-spacing: 0.5px;
+}
+
+.dim{display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:14px; color: #e6edf3;}
 .dim:last-child{border:none}
-.bar{display:inline-block;height:8px;background:#e0e6f0;border-radius:4px;width:80px;overflow:hidden;vertical-align:middle;margin-left:8px}
-.bar>span{display:block;height:100%;background:linear-gradient(90deg,#2a5298,#4a7bd8);border-radius:4px}
-canvas{display:block;margin:0 auto}
-.big{font-size:44px;font-weight:700;color:#2a5298;text-align:center;line-height:1}
+.bar{display:inline-block; height:8px; background:rgba(255,255,255,0.1); border-radius:4px; width:80px; overflow:hidden; vertical-align:middle; margin-left:8px;}
+.bar>span{display:block; height:100%; background: #00f0ff; border-radius:4px; box-shadow: 0 0 8px #00f0ff;}
+
+canvas{display:block; margin:0 auto;}
+.big{font-size:48px; font-weight:800; color:#00f0ff; text-align:center; line-height:1; text-shadow: 0 0 20px rgba(0,240,255,0.4); margin-bottom: 10px;}
 .center{text-align:center}
-.lang-box{display:flex;gap:10px;margin-top:15px}
-.lang-box button{width:50%;padding:10px;margin:0;background:#fff;color:#333;border:2px solid #e0e6f0}
-.lang-box button.active{background:#2a5298;color:#fff;border-color:#2a5298}
+
+.fab-ai {
+  position: fixed; bottom: 30px; right: 30px;
+  width: 60px; height: 60px; border-radius: 50%;
+  background: rgba(13, 17, 23, 0.9); border: 2px solid #00f0ff;
+  color: #00f0ff; font-size: 28px; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.4); cursor: pointer; z-index: 1000;
+  transition: 0.3s; backdrop-filter: blur(10px);
+  animation: pulse 2s infinite;
+}
+.fab-ai:hover { transform: scale(1.1); background: rgba(0, 240, 255, 0.2); }
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.7); }
+  70% { box-shadow: 0 0 0 15px rgba(0, 240, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 240, 255, 0); }
+}
+
+.ai-modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.8); backdrop-filter: blur(5px);
+  display: none; align-items: flex-end; justify-content: center; z-index: 2000;
+}
+@media(min-width: 800px) { .ai-modal-overlay { align-items: center; } }
+
+.ai-modal-content {
+  background: #212327;
+  border-radius: 24px;
+  width: 100%; max-width: 600px;
+  padding: 24px;
+  box-shadow: 0 -10px 40px rgba(0,240,255,0.1);
+  animation: slideUp 0.3s ease;
+  border: 1px solid rgba(255,255,255,0.05);
+  margin-bottom: 0;
+  position: relative; 
+}
+@media(min-width: 800px) { .ai-modal-content { margin-bottom: 20px; } }
+
+.ds-close-btn {
+  position: absolute;
+  top: 16px; right: 16px;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 18px; font-weight: bold;
+  transition: 0.2s;
+  border: none;
+}
+.ds-close-btn:hover { background: #ff4d4d; color: #fff; }
+
+@keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.ds-input-container {
+  background: #2b2d31;
+  border-radius: 20px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(255,255,255,0.05);
+  transition: border 0.3s;
+  margin-top: 10px;
+}
+.ds-input-container:focus-within { border-color: #3b82f6; }
+
+.ds-textarea {
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  font-family: inherit;
+  resize: none;
+  outline: none;
+  height: 80px;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+.ds-textarea::placeholder { color: #6b7280; }
+
+.ds-bottom-row { display: flex; justify-content: space-between; align-items: center; }
+
+.ds-tools { display: flex; gap: 8px; }
+
+.ds-pill-btn {
+  background: rgba(30, 58, 138, 0.3);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  color: #93c5fd;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: 0.2s;
+}
+.ds-pill-btn.active { background: rgba(30, 58, 138, 0.6); border-color: #3b82f6; color: #fff; }
+
+.ds-actions { display: flex; align-items: center; gap: 12px; }
+
+.ds-attach-btn { color: #9ca3af; cursor: pointer; transition: 0.2s; }
+.ds-attach-btn:hover { color: #fff; }
+
+.ds-send-btn {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: #3b82f6;
+  border: none;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.ds-send-btn:hover { background: #2563eb; }
+.ds-send-btn svg { fill: #fff; width: 16px; height: 16px; }
+
+.ds-disclaimer { text-align: center; font-size: 11px; color: #6b7280; margin-top: 16px; }
+
+.ai-response-box {
+  display: none;
+  background: rgba(59, 130, 246, 0.1);
+  border-left: 4px solid #3b82f6;
+  border-radius: 8px;
+  padding: 16px;
+  margin-top: 16px;
+  color: #e5e7eb;
+  font-size: 14px;
+  line-height: 1.5;
+  animation: fadeIn 0.5s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 </style>
 </head>
 <body>
-<div class="wrap" id="app"></div>
-<script>
+
+<div id="login-screen">
+  <div class="visual-side"><div class="ai-orb"></div></div>
+  <div class="login-card">
+    <div class="logo-container">
+      <svg class="logo-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+      <span class="logo-text">NeuroAssess <span>AI</span></span>
+    </div>
+    <p id="login-subtitle">Sign in to continue to your account</p>
+    <div class="tabs">
+      <button id="tab-en" class="active" onclick="setL('en')">English</button>
+      <button id="tab-cn" onclick="setL('cn')">中文</button>
+    </div>
+    <div class="input-label" id="label-name">Full Name</div>
+    <div class="input-group">
+      <svg class="input-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      <input type="text" id="uName" placeholder="Enter your name" value="">
+    </div>
+    <div class="input-label" id="label-id">Student ID</div>
+    <div class="input-group">
+      <svg class="input-icon" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+      <input type="text" id="uId" placeholder="Enter your ID" value="">
+    </div>
+    <button class="glow-btn" onclick="saveInfo()">
+      <span id="btn-txt">Sign 
+        <script>
 const T={
-en:{w:"Welcome",i:"Enter your details",n:"Full Name",id:"Student ID",nx:"Next",dm:"DEMO · AI COMPETENCY AGENT",t:"AI Competency Assessment",d:"This demo assesses 6 AI competency dimensions using an adaptive question engine.",l:"Adaptive logic: correct answer → harder question; wrong answer → easier question.",s:"Start Assessment",r:"ASSESSMENT REPORT",p:"Your AI Competency Profile",o:"Overall Score / 100",b:"Dimension Breakdown",ps:"Personalized Suggestions",rt:"Retake Assessment",D:["Basic AI","Prompt","Tools","Evaluation","Collaboration","Ethics"],tips:["Review fundamental AI concepts.","Practice clear prompts and few-shot examples.","Explore text, image, code generation tools.","Practice verifying AI outputs and spotting bias.","Decompose complex tasks and iterate with AI.","Strengthen AI ethics and privacy protection."]},
-cn:{w:"欢迎",i:"请输入您的信息",n:"姓名",id:"学号",nx:"下一步",dm:"演示 · AI 能力评估代理",t:"AI 能力评估",d:"此演示使用自适应问题引擎评估 6 个 AI 能力维度。",l:"自适应逻辑：正确 → 更难；错误 → 更简单。",s:"开始评估",r:"评估报告",p:"您的 AI 能力画像",o:"总分 / 100",b:"维度细分",ps:"个性化建议",rt:"重新评估",D:["AI基础","提示词","工具","评估","协作","伦理"],tips:["复习基本 AI 概念。","练习清晰的提示词和少样本示例。","探索文本、图像、代码生成工具。","练习验证 AI 输出并发现偏见。","分解复杂任务并迭代。","加强 AI 伦理和隐私保护。"]}
+en:{w:"Welcome",i:"Sign in to continue",l_name:"Full Name",l_id:"Student ID",n:"Full Name",id:"Student ID",nx:"Sign In",dm:"DEMO · NEUROASSESS AI",t:"AI Competency Assessment",d:"This test contains 9 Multiple Choice and 9 Open-Ended questions. Total 18 Questions.",l:"You can change your answers before submitting.",s:"Start Assessment",r:"ASSESSMENT REPORT",p:"Your AI Competency Profile",o:"Overall Score / 100",b:"Dimension Breakdown",ps:"Personalized Suggestions",rt:"Retake Assessment",btn_next:"Next ➔",btn_prev:"⬅ Previous",btn_sub:"Submit Assessment",txt_ph:"Type your answer here...",D:["Basic AI","Prompt","Tools","Evaluation","Collaboration","Ethics"],tips:["Review fundamental AI concepts.","Practice clear prompts and few-shot examples.","Explore text, image, code generation tools.","Practice verifying AI outputs and spotting bias.","Decompose complex tasks and iterate with AI.","Strengthen AI ethics and privacy protection."]},
+cn:{w:"欢迎",i:"登录以继续",l_name:"姓名",l_id:"学号",n:"姓名",id:"学号",nx:"登录",dm:"演示 · NEUROASSESS AI",t:"AI 能力评估",d:"本测试包含 9 道选择题和 9 道开放式题。共 18 题。",l:"提交前，您可以更改答案。",s:"开始评估",r:"评估报告",p:"您的 AI 能力画像",o:"总分 / 100",b:"维度细分",ps:"个性化建议",rt:"重新评估",btn_next:"下一题 ➔",btn_prev:"⬅ 上一题",btn_sub:"提交评估",txt_ph:"在此输入您的答案...",D:["AI基础","提示词","工具","评估","协作","伦理"],tips:["复习基本 AI 概念。","练习清晰的提示词和少样本示例。","探索文本、图像、代码生成工具。","练习验证 AI 输出并发现偏见。","分解复杂任务并迭代。","加强 AI 伦理和隐私保护。"]}
 };
-const Q={
-en:[[{q:"What does 'LLM' stand for?",o:["Large Language Model","Linear Learning Machine","Logical Layer Model","Long-term Memory"],a:0},{q:"Which is a typical 'AI hallucination'?",o:["A correct but slow answer","A plausible-sounding but wrong answer","An image with low resolution","A hardware failure"],a:1},{q:"What does 'temperature' mainly control?",o:["Randomness/creativity","Model memory size","Training speed","GPU temperature"],a:0}],[{q:"Which prompt is the clearest?",o:["Tell me about AI","Explain AI to a 10-year-old in 3 sentences","AI???","Write something"],a:1},{q:"What is 'few-shot prompting'?",o:["Asking very few questions","Giving a few examples","Running on few GPUs","Using a short prompt"],a:1},{q:"You need JSON output. Best approach?",o:["Ask politely","Give a schema and explicit format constraints","Use shorter words","Ask the model to guess"],a:1}],[{q:"Which is an AI tool for code generation?",o:["GitHub Copilot","Excel","Notepad","Photoshop"],a:0},{q:"Analyze a 500-row CSV. Best AI workflow?",o:["Paste everything and hope","Use a data-analysis AI tool and ask for a specific metric","Ask the model to memorize it","Skip analysis"],a:1},{q:"To generate images from text, use:",o:["A code editor","A text-to-image model","A spreadsheet","A database"],a:1}],[{q:"AI gives a confident but wrong fact. You should:",o:["Trust it","Verify with a reliable source","Ignore AI forever","Copy it directly"],a:1},{q:"Reduce hallucinations by:",o:["Asking to cite sources and verify","Increasing temperature","Asking vaguely","Shorter prompts"],a:0},{q:"Notice biased output. Best action?",o:["Publish it","Flag it and ask for balanced alternatives","Ignore it","Increase speed"],a:1}],[{q:"Human-AI collaboration means:",o:["AI does everything","Human and AI split tasks by strength","Human does nothing","AI replaces human"],a:1},{q:"Best way to complete complex task with AI?",o:["One huge prompt","Decompose into steps, review each output","Ask AI to do it all","Skip planning"],a:1},{q:"AI output partially wrong. Best step?",o:["Restart everything","Give corrective feedback and iterate","Submit as is","Delete project"],a:1}],[{q:"Before pasting personal data into AI:",o:["Paste it anyway","Remove/anonymize data first","Share password","Ignore privacy"],a:1},{q:"AI content used commercially must consider:",o:["Only speed","Copyright and license terms","Only length","Only language"],a:1},{q:"Responsible AI usage includes:",o:["Hiding AI involvement","Transparency and human review","Removing all citations","Using AI for everything"],a:1}]],
-cn:[[{q:"'LLM'代表什么？",o:["大型语言模型","线性学习机","逻辑层模型","长期记忆"],a:0},{q:"什么是典型的“AI幻觉”？",o:["正确但缓慢的答案","听起来合理但事实错误的答案","低分辨率图像","硬件故障"],a:1},{q:"“温度”参数主要控制什么？",o:["随机性/创造力","模型内存大小","训练速度","GPU温度"],a:0}],[{q:"哪个提示词最清晰？",o:["告诉我关于AI的事","用3句话向10岁孩子解释AI","AI???","写点什么"],a:1},{q:"什么是“少样本提示”？",o:["问很少的问题","给出几个示例","在少数GPU上运行","使用短提示"],a:1},{q:"需要JSON输出。最佳方法？",o:["礼貌请求","给出Schema和明确的格式约束","使用更短的词","让模型猜"],a:1}],[{q:"哪个是代码生成AI工具？",o:["GitHub Copilot","Excel","Notepad","Photoshop"],a:0},{q:"分析500行CSV。最佳工作流？",o:["粘贴所有内容并祈祷","使用数据分析工具并询问具体指标","让模型记住","跳过分析"],a:1},{q:"从文本生成图像，使用：",o:["代码编辑器","文生图模型","电子表格","数据库"],a:1}],[{q:"AI给出自信但错误的事实。你应该：",o:["相信它","通过可靠来源验证","永远忽略AI","直接复制"],a:1},{q:"减少幻觉的方法：",o:["要求引用来源并验证","增加温度","模糊提问","使用短提示"],a:0},{q:"发现AI输出有偏见。最佳行动？",o:["发布它","标记并要求平衡的替代方案","忽略它","提高速度"],a:1}],[{q:"人机协作意味着：",o:["AI做所有事","人类和AI按优势分工","人类什么都不做","AI取代人类"],a:1},{q:"用AI完成复杂任务的最佳方法？",o:["一个巨大的提示词","分解步骤，审查每个输出","让AI一次完成","跳过计划"],a:1},{q:"AI输出部分错误。最佳步骤？",o:["重新开始","提供纠正反馈并迭代","直接提交","删除项目"],a:1}],[{q:"将个人数据粘贴到AI之前：",o:["直接粘贴","首先匿名化/删除数据","分享密码","忽略隐私"],a:1},{q:"商业使用的AI生成内容必须考虑：",o:["只考虑速度","版权和许可条款","只考虑长度","只考虑语言"],a:1},{q:"负责任的AI使用包括：",o:["隐藏AI参与","AI使用的透明度和人工审查","删除所有引用","使用AI做所有事"],a:1}]]};
 
-const app=document.getElementById('app');
-let L='en', U={n:'',id:''}, S={d:0,l:2,ak:[],p:[0,0,0,0,0,0]};
+const QUESTIONS_DATA = [
+  { type: 'mcq', q: "What is the primary function of the 'Attention Mechanism' in Transformer models?", o: ["To physically focus GPU power","To weigh the importance of different words in a sequence","To increase the model's memory size","To filter out inappropriate content"], a: 1, ans: "The correct answer is B. The Attention Mechanism helps the model focus on relevant parts of the input sequence." },
+  { type: 'mcq', q: "Which prompting technique assigns a specific persona to the AI to improve domain-specific answers?", o: ["Role Prompting","Zero-shot","Token Limit","Semantic search"], a: 0, ans: "The correct answer is A. Role prompting involves telling the AI 'You are an expert in...' to get better results." },
+  { type: 'mcq', q: "Which tool is specifically designed for AI-assisted coding in the IDE?", o: ["ChatGPT Web","GitHub Copilot","Midjourney","DALL-E"], a: 1, ans: "The correct answer is B. GitHub Copilot is an IDE extension that suggests code in real-time." },
+  { type: 'mcq', q: "What is 'Algorithmic Bias' in AI?", o: ["When an AI prefers a specific programming language","Systematic and repeatable errors that create unfair outcomes","When the AI runs too fast","When the AI hallucinates a historical fact"], a: 1, ans: "The correct answer is B. It refers to systematic unfairness in AI models." },
+  { type: 'mcq', q: "What is 'Human-in-the-loop' (HITL) in AI systems?", o: ["Humans are completely removed from the process","Humans monitor, correct, and fine-tune AI outputs to ensure quality","Humans manually type every response","AI replaces human workers"], a: 1, ans: "The correct answer is B. HITL means humans are actively involved in reviewing and improving AI outputs." },
+  { type: 'mcq', q: "Before sending company data to a public LLM API, what must you do?", o: ["Send it as is","Ensure PII is anonymized or redacted","Upload it to a public forum first","Encrypt the text into Base64"], a: 1, ans: "The correct answer is B. You must always protect sensitive data (PII) before using public APIs." },
+  { type: 'mcq', q: "You need an LLM to output strict JSON format. Which approach yields the highest compliance?", o: ["Asking politely in the prompt","Providing a JSON schema/example in the prompt","Using shorter words","Increasing the temperature"], a: 1, ans: "The correct answer is B. Providing a schema or example is the best way to get structured data." },
+  { type: 'mcq', q: "In the context of RAG (Retrieval-Augmented Generation), what does 'Retrieval' do?", o: ["Deletes old data","Fetches relevant external knowledge from a database","Increases the model's temperature","Translates the prompt"], a: 1, ans: "The correct answer is B. RAG fetches relevant info from a database to give the AI context." },
+  { type: 'mcq', q: "Which model type is specifically trained to generate images from text prompts?", o: ["LLM (Large Language Model)","VLM (Vision Language Model)","Diffusion Model","Random Forest"], a: 2, ans: "The correct answer is C. Diffusion Models (like Midjourney or DALL-E) are used for text-to-image generation." },
+  { type: 'text', q: "Explain the difference between 'Zero-shot' and 'Few-shot' prompting. Provide a brief example.", ans: "Zero-shot means asking the AI to do a task without any examples. Few-shot means providing 2-3 examples in the prompt before asking the question." },
+  { type: 'text', q: "What is 'AI Hallucination'? Give one example of when it might occur and how you can prevent it.", ans: "A hallucination is when the AI confidently makes up false information. E.g., Citing a fake research paper. Prevent it by using RAG and fact-checking." },
+  { type: 'text', q: "Describe how you would use the 'Chain of Thought' (CoT) prompting technique to solve a complex math problem.", ans: "You would tell the AI to 'think step-by-step' and show its work before giving the final answer. This improves reasoning." },
+  { type: 'text', q: "What are the main ethical concerns regarding AI-generated content used in commercial products?", ans: "Copyright infringement, lack of transparency (not disclosing AI use), and potential for generating biased or harmful content." },
+  { type: 'text', q: "Explain the concept of 'Temperature' in Large Language Models. How does changing it affect the output?", ans: "Temperature controls randomness. A low temperature (0.2) makes the output focused and deterministic. A high temperature (0.8) makes it creative and random." },
+  { type: 'text', q: "If you are using an AI to write a Python script and it gives a bug, what are the exact steps you would take to fix it?", ans: "I would copy the error message, explain what I expected the code to do, and paste both back into the AI to ask for a correction." },
+  { type: 'text', q: "Define 'Prompt Injection' and explain why it is a major security risk for LLM-powered applications.", ans: "Prompt injection is when a user tricks the AI into ignoring its original instructions by providing malicious input. It can lead to data leaks." },
+  { type: 'text', q: "How does 'Retrieval-Augmented Generation' (RAG) help in reducing hallucinations in enterprise chatbots?", ans: "RAG forces the AI to base its answer on specific documents retrieved from a database, rather than just relying on its own memory." },
+  { type: 'text', q: "Discuss the importance of 'Data Privacy' when using public AI tools like ChatGPT or Claude in a corporate environment.", ans: "Public AI tools may use your data for training. It's crucial to anonymize data and use enterprise/private versions of AI tools to protect com
 
-function langSel(){
- app.innerHTML=`<div class="card center"><div class="tag">${T[L].dm}</div><h1>${T[L].w}</h1><p>${T[L].i}</p>
- <div class="lang-box">
-   <button class="${L==='en'?'active':''}" onclick="setL('en')">EN</button>
-   <button class="${L==='cn'?'active':''}" onclick="setL('cn')">CN</button>
- </div></div>`;
+   const app=document.getElementById('app');
+let L='en', U={n:'',id:''}, S={index:0, answers:new Array(18).fill(null)};
+let testQuestions = [];
+
+function shuffleArray(array) {
+  let curId = array.length;
+  while (0 !== curId) {
+    let randId = Math.floor(Math.random() * curId);
+    curId -= 1;
+    let tmp = array[curId];
+    array[curId] = array[randId];
+    array[randId] = tmp;
+  }
+  return array;
 }
-function setL(l){L=l;userInfo();}
-function userInfo(){
- app.innerHTML=`<div class="card center"><div class="tag">${T[L].dm}</div><h1>${T[L].i}</h1>
- <input type="text" id="uName" placeholder="${T[L].n}" value="${U.n}">
- <input type="text" id="uId" placeholder="${T[L].id}" value="${U.id}">
- <button onclick="saveInfo()">${T[L].nx}</button></div>`;
+          function setL(l){
+  L=l;
+  document.getElementById('tab-en').classList.remove('active');
+  document.getElementById('tab-cn').classList.remove('active');
+  document.getElementById('tab-'+l).classList.add('active');
+  
+  document.getElementById('login-subtitle').innerText = T[L].i;
+  document.getElementById('label-name').innerText = T[L].l_name;
+  document.getElementById('label-id').innerText = T[L].l_id;
+  document.getElementById('uName').placeholder = T[L].n;
+  document.getElementById('uId').placeholder = T[L].id;
+  document.getElementById('btn-txt').innerText = T[L].nx;
 }
+
 function saveInfo(){
- const n=document.getElementById('uName').value;const id=document.getElementById('uId').value;
- if(!n||!id)return alert("Please fill all fields");
- U={n,id};intro();
+  const n = document.getElementById('uName').value.trim();
+  const id = document.getElementById('uId').value.trim();
+  
+  if(n.length < 3) return alert(L === 'en' ? "Invalid Name!" : "姓名无效！");
+  if(!/^[0-9]{5,15}$/.test(id)) return alert(L === 'en' ? "Invalid Student ID!" : "学号无效！");
+  
+  U={n,id};
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('test-screen').style.display = 'block';
+  document.getElementById('fabAi').style.display = 'flex'; 
+  intro();
 }
+
 function intro(){
- app.innerHTML=`<div class="card"><div class="tag">${T[L].dm}</div><h1>${T[L].t}</h1><p>${T[L].d}</p><p><b>Adaptive logic:</b> ${T[L].l}</p>
- <button onclick="begin()">${T[L].s}</button></div>`;
+ document.getElementById('fabAi').style.display = 'none'; 
+ app.innerHTML=`<div class="card center">
+ <div class="tag">${T[L].dm}</div>
+ <h1>${T[L].t}</h1><p>${T[L].d}</p><p>${T[L].l}</p>
+ <button class="glow-btn" onclick="begin()">${T[L].s}</button></div>`;
 }
-function begin(){S={d:0,l:2,ak:[],p:[0,0,0,0,0,0]};q();}
+
+function begin(){
+  S={index:0, answers:new Array(18).fill(null)};
+  document.getElementById('fabAi').style.display = 'flex'; 
+  testQuestions = shuffleArray([...QUESTIONS_DATA]);
+  q();
+}
 
 function q(){
- if(S.d>=6)return rep(); // Pratik görevi atlayıp direkt rapora gider
- let l=S.l;
- if(S.ak.includes(l)){const r=[1,2,3].filter(x=>!S.ak.includes(x));if(!r.length){S.d++;S.ak=[];S.l=2;return q();}l=r[0];}
- const Qs=Q[L][S.d];const quest=Qs[l-1];S.ak.push(l);S.l=l;
- const pct=((S.d*3+S.ak.length)/18)*100;
- app.innerHTML=`<div class="card"><div class="tag">Dimension ${S.d+1}/6 · ${T[L].D[S.d]}</div>
- <div class="progress"><div style="width:${pct}%"></div></div><h2>${quest.q}</h2><div id="o"></div></div>`;
- const oc=document.getElementById('o');
- quest.o.forEach((t,i)=>{
-  const b=document.createElement('button');b.className='opt';b.textContent=String.fromCharCode(65+i)+'. '+t;
-  b.onclick=()=>{if(oc.dataset.k)return;oc.dataset.k=1;b.classList.add('sel');setTimeout(()=>ans(i===quest.a,l),200);};oc.appendChild(b);
- });
-}
-function ans(c,l){if(c)S.p[S.d]+=l;let n=c?l+1:l-1;if(n<1)n=1;if(n>3)n=3;S.l=n;if(S.ak.length>=3){S.d++;S.ak=[];S.l=2;}q();}
+ let currentQ = testQuestions[S.index];
+ const pct = ((S.index) / 18) * 100;
+ const dimIndex = S.index % 6;
+ 
+ let dotsHTML = '<div class="dots-container">';
+ for(let i=0; i<18; i++) {
+     let isAnswered = false;
+     if(S.answers[i]) {
+         if(S.answers[i].type === 'mcq' && S.answers[i].selected) isAnswered = true;
+         if(S.answers[i].type === 'text' && S.answers[i].text && S.answers[i].text.trim() !== '') isAnswered = true;
+     }
+     let dotClass = 'dot';
+     if(i === S.index) dotClass += ' active';
+     else if(isAnswered) dotClass += ' answered';
+     dotsHTML += `<div class="${dotClass}"></div>`;
+ }
+ dotsHTML += '</div>';
+ 
+ let html = `<div class="card">
+  <div class="tag">Question ${S.index + 1} / 18 · ${T[L].D[dimIndex]}</div>
+  ${dotsHTML}
+  <div class="progress"><div style="width:${pct}%"></div></div>
+  <h2>${currentQ.q}</h2>`;
 
-function rep(){
- const sc=S.p.map(p=>Math.round(p/6*100));const ov=Math.round(sc.reduce((a,b)=>a+b,0)/6);
+ if(currentQ.type === 'mcq') {
+    let opts = currentQ.o.map((text, index) => ({ text, isCorrect: index === currentQ.a }));
+    
+    if(!S.answers[S.index]) {
+        S.answers[S.index] = { type:'mcq', opts: shuffleArray(opts), selected: null };
+    }
+
+    html += `<div id="o"></div>`;
+    html += `<div class="nav-buttons">`;
+    if(S.index > 0) html += `<button class="btn-prev" onclick="prevQ()">${T[L].btn_prev}</button>`;
+    if(S.index < 17) html += `<button class="btn-next" onclick="nextQ()">${T[L].btn_next}</button>`;
+    else html += `<button class="btn-submit" onclick="submitTest()">${T[L].btn_sub}</button>`;
+    html += `</div></div>`;
+    
+    app.innerHTML = html;
+
+    const oc=document.getElementById('o');
+    S.answers[S.index].opts.forEach((opt, i)=>{
+      const b=document.createElement('button');
+      b.className = 'opt';
+      if(S.answers[S.index].selected === opt.text) b.classList.add('sel');
+      
+      b.textContent = String.fromCharCode(65+i)+'. '+opt.text;
+      b.onclick=()=>{
+          S.answers[S.index].selected = opt.text;
+          S.answers[S.index].isCorrect = opt.isCorrect;
+          q(); 
+      };
+      oc.appendChild(b);
+    });
+ } else {
+    html += `
+      <textarea class="textarea-box" id="textAns" placeholder="${T[L].txt_ph}">${S.answers[S.index] ? S.answers[S.index].text : ''}</textarea>
+      <div class="nav-buttons">
+        ${S.index > 0 ? `<button class="btn-prev" onclick="prevQ()">${T[L].btn_prev}</button>` : ''}
+        ${S.index < 17 ? `<button class="btn-next" onclick="nextQ()">${T[L].btn_next}</button>` : `<button class="btn-submit" onclick="submitTest()">${T[L].btn_sub}</button>`}
+      </div>
+    </div>`;
+    app.innerHTML = html;
+ }
+}
+
+function prevQ(){
+  let currentQ = testQuestions[S.index];
+  if(currentQ.type === 'text') {
+      let val = document.getElementById('textAns').value;
+      S.answers[S.index] = { type:'text', text: val };
+  }
+  S.index--;
+  q();
+}
+
+function nextQ(){
+  let currentQ = testQuestions[S.index];
+  if(currentQ.type === 'text') {
+      let val = document.getElementById('textAns').value;
+      S.answers[S.index] = { type:'text', text: val };
+  }
+  S.index++;
+  q();
+}
+
+function submitTest(){
+  let currentQ = testQuestions[S.index];
+  if(currentQ.type === 'text') {
+      let val = document.getElementById('textAns').value;
+      S.answers[S.index] = { type:'text', text: val };
+  }
+  
+  let points = [0,0,0,0,0,0];
+  S.answers.forEach((ans, idx) => {
+      if(ans) {
+          let dim = idx % 6;
+          if(ans.type === 'mcq' && ans.isCorrect) points[dim] += 2;
+          if(ans.type === 'text' && ans.text && ans.text.trim() !== "") points[dim] += 2;
+      }
+  });
+  
+  rep(points);
+}
+
+function openAiModal() {
+  document.getElementById('aiModal').style.display = 'flex';
+  document.getElementById('dsPrompt').value = ""; 
+  document.getElementById('aiResponseBox').style.display = 'none';
+}
+
+function sendToAI() {
+  let prompt = document.getElementById('dsPrompt').value.trim();
+  if(!prompt) return;
+
+  let currentQ = testQuestions[S.index];
+  let responseBox = document.getElementById('aiResponseBox');
+  let responseText = document.getElementById('aiResponseText');
+
+  responseBox.style.display = 'block';
+  responseText.innerHTML = "<i>Düşünüyor... (Thinking...)</i>";
+
+  setTimeout(() => {
+      if(currentQ.type === 'mcq') {
+          let correctLetter = String.fromCharCode(65 + currentQ.a);
+          responseText.innerHTML = `<b>Analiz Tamamlandı.</b><br><br>Sorunuzu inceledim. Doğru cevap: <b style="color:#3b82f6; font-size:18px;">${correctLetter}</b>.<br><br><i>Neden?</i> ${currentQ.ans || "Bu seçenek, sorudaki yapay zeka kavramına en uygun tanımı içeriyor."}`;
+      } else {
+          responseText.innerHTML = `<b>Analiz Tamamlandı.</b><br><br>İşte cevabınız:<br><br>${currentQ.ans || "Açık uçlu sorular için detaylı bir açıklama yapılması gerekir."}`;
+      }
+  }, 1500); 
+}
+
+function closeAiModal() {
+  document.getElementById('aiModal').style.display = 'none';
+}
+
+function rep(points){
+ document.getElementById('fabAi').style.display = 'none'; 
+ 
+ let totalPoints = points.reduce((a,b)=>a+b, 0);
+ let sc = points.map(p => Math.round((p / 6) * 100)); 
+ let ov = Math.round(totalPoints / 36 * 100);
+
  let h=`<div class="card center"><div class="tag">${T[L].r}</div><h1>${T[L].p}</h1>
- <p style="font-size:16px;font-weight:bold;color:#2a5298;">${U.n} (${U.id})</p>
- <div class="big">${ov}</div><p>${T[L].o}</p><canvas id="radar" width="300" height="300"></canvas></div>
+ <p style="font-size:16px;font-weight:bold;color:#fff; margin-top:10px;">${U.n} (${U.id})</p>
+ <div class="big">${ov}</div><p>${T[L].o}</p>
+ <canvas id="radar" width="300" height="300"></canvas></div>
  <div class="card"><h2>${T[L].b}</h2>`;
+ 
  sc.forEach((s,i)=>{h+=`<div class="dim"><span>${T[L].D[i]}</span><span><b>${s}</b><span class="bar"><span style="width:${s}%"></span></span></span></div>`;});
  h+=`</div><div class="card"><h2>${T[L].ps}</h2>`;
+ 
  const srt=sc.map((s,i)=>({s,i})).sort((a,b)=>a.s-b.s).slice(0,2);
- srt.forEach(w=>{h+=`<p><b>${T[L].D[w.i]}:</b> ${T[L].tips[w.i]}</p>`;});
- h+=`<button class="alt" onclick="intro()">${T[L].rt}</button></div>`;
- app.innerHTML=h;radar(sc);
+ srt.forEach(w=>{h+=`<p><b style="color:#00f0ff;">${T[L].D[w.i]}:</b> ${T[L].tips[w.i]}</p>`;});
+ h+=`<button class="glow-btn" style="margin-top:20px;" onclick="location.reload()">${T[L].rt}</button></div>`;
+ 
+ h += `<div class="card center" style="background:rgba(13, 17, 23, 0.85); border:2px solid #00f0ff; padding:15px; box-shadow: 0 0 20px rgba(0,240,255,0.2);">
+        <h2 style="color:#00f0ff; font-size:16px; margin-bottom:10px;">Pareto Analysis (Neon)</h2>
+        <canvas id="paretoChart" width="350" height="280"></canvas>
+       </div>`;
+
+ app.innerHTML=h;
+ radar(sc);
+ drawPareto(sc); 
 }
+
+function drawPareto(sc){
+ const c = document.getElementById('paretoChart');
+ if(!c) return;
+ const ctx = c.getContext('2d');
+ const W = c.width, H = c.height;
+ 
+ const pL = 30, pR = 30, pT = 20, pB = 40;
+ const cW = W - pL - pR;
+ const cH = H - pT - pB;
+
+ ctx.clearRect(0,0,W,H);
+
+ ctx.fillStyle = 'rgba(255, 77, 77, 0.15)'; 
+ ctx.fillRect(pL + cW * 0.8, pT, cW * 0.2, cH);
+ ctx.fillStyle = 'rgba(0, 255, 136, 0.15)'; 
+ ctx.fillRect(pL + cW * 0.5, pT, cW * 0.3, cH);
+ ctx.fillStyle = 'rgba(0, 150, 255, 0.15)'; 
+ ctx.fillRect(pL, pT, cW * 0.5, cH);
+
+ ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 1;
+ for(let i=0; i<=5; i++) {
+    let y = pT + cH - (cH * (i/5));
+    ctx.beginPath(); ctx.moveTo(pL, y); ctx.lineTo(pL+cW, y); ctx.stroke();
+    ctx.fillStyle = '#c9d1d9'; ctx.font = '10px Arial'; ctx.textAlign='right';
+    ctx.fillText(i*20, pL-5, y+3);
+    ctx.textAlign='left';
+    ctx.fillText(i*20 + '%', pL+cW+5, y+3);
+ }
+
+ let sortedData = sc.map((score, index) => ({ score, name: T[L].D[index].substring(0,5) }))
+                    .sort((a,b) => b.score - a.score);
+ 
+ let barW = (cW / sortedData.length) * 0.6;
+ let gap = (cW / sortedData.length) * 0.4;
+ 
+ let cumSum = 0;
+ const points = [];
+
+ sortedData.forEach((item, i) => {
+    let barH = (item.score / 100) * cH;
+    let x = pL + (i * (barW + gap)) + gap/2;
+    let y = pT + cH - barH;
+    
+    ctx.fillStyle = 'rgba(0, 240, 255, 0.3)';
+    ctx.fillRect(x, y, barW, barH);
+    ctx.strokeStyle = '#00f0ff'; 
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(x, y, barW, barH);
+
+    ctx.fillStyle = '#c9d1d9'; ctx.font = '9px Arial'; ctx.textAlign='center';
+    ctx.fillText(item.name, x + barW/2, pT + cH + 15);
+
+    cumSum += item.score;
+    let cumPct = cumSum / 6; 
+    let lineY = pT + cH - (cH * (cumPct / 100));
+    points.push({ x: x + barW/2, y: lineY, val: Math.round(cumPct) });
+ });
+
+   ctx.beginPath();
+ ctx.strokeStyle = '#ff00ff'; 
+ ctx.lineWidth = 2;
+ ctx.shadowBlur = 10;
+ ctx.shadowColor = '#ff00ff';
+ points.forEach((p, i) => {
+    if(i === 0) ctx.moveTo(p.x, p.y);
+    else ctx.lineTo(p.x, p.y);
+ });
+ ctx.stroke();
+ ctx.shadowBlur = 0; 
+
+ points.forEach(p => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 4, 0, 2*Math.PI);
+    ctx.fillStyle = '#ff00ff';
+    ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke();
+ });
+}
+
 function radar(sc){
  const c=document.getElementById('radar'),x=c.getContext('2d'),W=300,H=300,cx=150,cy=150,R=110,n=6;
  x.clearRect(0,0,W,H);
- for(let k=1;k<=4;k++){x.beginPath();for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n,r=R*k/4;const px=cx+Math.cos(a)*r,py=cy+Math.sin(a)*r;i?x.lineTo(px,py):x.moveTo(px,py);}x.closePath();x.strokeStyle='#dbe3f0';x.stroke();}
- for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R);x.strokeStyle='#dbe3f0';x.stroke();}
+ for(let k=1;k<=4;k++){x.beginPath();for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n,r=R*k/4;const px=cx+Math.cos(a)*r,py=cy+Math.sin(a)*r;i?x.lineTo(px,py):x.moveTo(px,py);}x.closePath();x.strokeStyle='rgba(255,255,255,0.1)';x.stroke();}
+ for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;x.beginPath();x.moveTo(cx,cy);x.lineTo(cx+Math.cos(a)*R,cy+Math.sin(a)*R);x.strokeStyle='rgba(255,255,255,0.1)';x.stroke();}
  x.beginPath();for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n,r=R*(sc[i]||0)/100;const px=cx+Math.cos(a)*r,py=cy+Math.sin(a)*r;i?x.lineTo(px,py):x.moveTo(px,py);}
- x.closePath();x.fillStyle='rgba(42,82,152,.25)';x.fill();x.strokeStyle='#2a5298';x.lineWidth=2;x.stroke();
- x.fillStyle='#333';x.font='11px sans-serif';x.textAlign='center';x.textBaseline='middle';
+ x.closePath();x.fillStyle='rgba(0,240,255,0.2)';x.fill();x.strokeStyle='#00f0ff';x.lineWidth=2;x.stroke();
+ for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n,r=R*(sc[i]||0)/100;const px=cx+Math.cos(a)*r,py=cy+Math.sin(a)*r;x.beginPath();x.arc(px,py,3.5,0,7);x.fillStyle='#00f0ff';x.fill();}
+ x.fillStyle='#c9d1d9';x.font='11px sans-serif';x.textAlign='center';x.textBaseline='middle';
  for(let i=0;i<n;i++){const a=-Math.PI/2+i*2*Math.PI/n;x.fillText(T[L].D[i],cx+Math.cos(a)*(R+22),cy+Math.sin(a)*(R+22));}
 }
-langSel();
+
+setL('en');
 </script>
 </body>
 </html>
